@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Olympic Athletes Parallel Coordinates Plot</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+
+<div id="parallel-coordinates-plot"></div>
+
+<script>
+// Load the CSV data
+d3.csv("athlete_events.csv").then(data => {
+  // Filter data for medalists only and drop rows with missing values in key columns
+  const filteredData = data.filter(d => d.Medal && d.Team && d.Height && d.Weight && d.Age && d.Year && d.Sport);
+
+  // Sample a subset of rows for a clearer visualization
+  const sampledData = filteredData;  // Adjust sample size as needed
+
+  // Create mappings for Team and Sport categories
+  const teamMapping = {};
+  const sportMapping = {};
+
+  let teamCounter = 0;
+  let sportCounter = 0;
+
+  sampledData.forEach(d => {
+    // Map Team to categorical codes
+    if (!(d.Team in teamMapping)) {
+      teamMapping[d.Team] = teamCounter++;
+    }
+    d.Team = teamMapping[d.Team];
+
+    // Map Sport to categorical codes
+    if (!(d.Sport in sportMapping)) {
+      sportMapping[d.Sport] = sportCounter++;
+    }
+    d.Sport = sportMapping[d.Sport];
+
+    // Map Sex and Medal to numeric codes
+    d.Sex = d.Sex === 'M' ? 0 : 1;
+    d.Medal = d.Medal === 'Gold' ? 2 : d.Medal === 'Silver' ? 1 : 0;
+  });
+
+  // Create parallel coordinates plot data
+  const plotData = [{
+    type: 'parcoords',
+    dimensions: [
+      {label: 'Year', values: sampledData.map(d => +d.Year)},
+      {label: 'Age', values: sampledData.map(d => +d.Age)},
+      {label: 'Height', values: sampledData.map(d => +d.Height)},
+      {label: 'Weight', values: sampledData.map(d => +d.Weight)},
+      {
+        label: 'Gender (0=M, 1=F)',
+        values: sampledData.map(d => +d.Sex),
+        tickvals: [0, 1],
+        ticktext: ['M', 'F']
+      },
+      {label: 'Team', values: sampledData.map(d => +d.Team), ticktext: Object.keys(teamMapping)},
+      {label: 'Sport', values: sampledData.map(d => +d.Sport), ticktext: Object.keys(sportMapping)},
+      {
+        label: 'Medal Category',
+        values: sampledData.map(d => +d.Medal),
+        tickvals: [0, 1, 2],
+        ticktext: ['Bronze', 'Silver', 'Gold']
+      }
+    ],
+    line: {
+      color: sampledData.map(d => d.Medal),
+    //   colorscale: [
+    //     [0, '#cd7f32'],    // Bronze
+    //     [0.5, 'black'],    // Silver
+    //     [1, 'gold']         // Gold
+    //   ]
+    }
+  }];
+
+  // Layout for the plot
+  const layout = {
+    title: "Olympic Athletes Parallel Coordinates Plot for Medalists",
+    width: 1500,
+    height: 750
+  };
+
+  // Render the plot
+  Plotly.newPlot('parallel-coordinates-plot', plotData, layout);
+});
+</script>
+
+</body>
+</html>
