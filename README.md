@@ -112,3 +112,48 @@ pip install numpy xarray imageio matplotlib basemap scipy
 
 ## Example Plots
 The script will save the plots in the specified directory and create a GIF animation.
+
+
+
+
+# Colormap Visualization Script
+
+## Description
+This script generates colormap visualizations for various weather data variables. It creates plots for specific weather events and saves them as images.
+
+## Prerequisites
+Ensure you have the following libraries installed:
+- xarray
+- matplotlib
+- numpy
+- cartopy
+- os
+
+You can install all the necessary libraries using pip:
+```bash
+pip install xarray matplotlib numpy cartopy
+```
+
+## Usage
+1. **Set up your data paths:**
+   - Update the `load_single_weather_data` function in the script to point to the appropriate dataset paths for the year 2024.
+
+2. **Run the script:**
+   - You can run the script directly to generate colormap plots for specified weather events.
+   - Example:
+     ```bash
+     python colormap (2).py
+     ```
+
+   - The script will generate plots for the following weather events:
+     - Drought and Wildfires on specified days (153, 168, 183, 198, 213, 228)
+
+3. **Output:**
+   - The generated plots will be saved in the specified `output_dir` directory.
+
+## File Structure
+- `colormap (2).py`: The main script file.
+
+## Example Plots
+The script will save the plots in the specified directory.
+
