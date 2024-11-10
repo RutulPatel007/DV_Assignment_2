@@ -312,5 +312,5 @@ python colormap\ \(2\).py
 ```
 
 Output:
-temperature_animation_continuous
-temperature_animation_logarithmic
+1. temperature_animation_continuous
+2. temperature_animation_logarithmic
