@@ -260,3 +260,57 @@ Please update the example file paths in the code if your data files are named di
  ```bash
 python contour.py
 ```
+
+# COLORMAP Analysis
+
+This project provides a set of Python scripts for visualizing weather data, specifically maximum temperature, using different color mapping and normalization techniques. The visualizations include continuous and logarithmic color maps for temperature data across various days, as well as additional visualizations for other weather-related variables.
+
+## Files and Descriptions
+
+### `color_log.py`
+This script generates an animated visualization of daily maximum temperature data using a logarithmic color scale. The dataset is visualized over a series of days, showing how the temperature changes over time with colors scaled logarithmically for better contrast in large temperature ranges.
+
+- **Dependencies**: `numpy`, `matplotlib`, `netCDF4`
+- **Usage**:
+  1. Load daily maximum temperature data from NetCDF files.
+  2. Define a series of days to visualize.
+  3. Calculate minimum and maximum temperature values globally for logarithmic scaling.
+  4. Use `matplotlib.animation` to create an animated GIF (`temperature_animation_logarithmic.gif`).
+
+### `color_cont.py`
+This script creates a continuous color scale animation for daily maximum temperature data. Unlike `color_log.py`, this script uses a linear color normalization, providing a direct visual comparison of temperature changes without logarithmic scaling.
+
+- **Dependencies**: `numpy`, `matplotlib`, `netCDF4`
+- **Usage**:
+  1. Similar to `color_log.py`, but applies a linear color scale to the temperature data.
+  2. Saves the animation as a GIF file (`temperature_animation_continuous.gif`).
+
+### `colormap (2).py`
+This script is used for generating weather data plots with customizable color maps and scaling options. It includes support for different weather variables (e.g., wind speed, solar radiation, precipitation) and offers options for both continuous and discrete color scales. Additionally, it uses `cartopy` to create geographic projections.
+
+- **Dependencies**: `xarray`, `matplotlib`, `numpy`, `cartopy`
+- **Usage**:
+  1. Load specific weather variable data from NetCDF files.
+  2. Choose a color scale (continuous or discrete) and normalization method (e.g., logarithmic, linear).
+  3. Generate plots for specified days and save as images with geographic context.
+
+## Prerequisites
+Ensure the following Python packages are installed:
+```bash
+pip install numpy matplotlib netCDF4 xarray cartopy
+```
+
+## Running the Scripts
+To create the animations, run color_log.py and color_cont.py. Ensure that the NetCDF files are correctly located in the specified path.
+```bash
+python color_log.py
+python color_cont.py
+```
+To create customized weather event plots, use **colormap (2).py**:
+```bash
+python colormap\ \(2\).py
+```
+
+Output:
+temperature_animation_continuous
+temperature_animation_logarithmic
