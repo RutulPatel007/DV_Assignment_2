@@ -13,7 +13,8 @@
 
 <script>
 // Load the CSV data
-d3.csv("athlete_events.csv").then(data => {
+//Change the dataset path as per your local setup
+d3.csv("./Datasets/athlete_events.csv").then(data => {
   // Filter data for medalists only and drop rows with missing values in key columns
   const filteredData = data.filter(d => d.Medal && d.Team && d.Height && d.Weight && d.Age && d.Year && d.Sport);
 

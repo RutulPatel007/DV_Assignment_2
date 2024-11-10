@@ -38,7 +38,8 @@ function loadNetFile(filePath) {
 }
 
 // Load and plot the data
-loadNetFile("jazz.net").then(edgesData => {
+//Change the dataset file path as per your local setup
+loadNetFile("./Datasets/jazz.net").then(edgesData => {
   const plotData = [{
     type: 'parcoords',
     line: {
