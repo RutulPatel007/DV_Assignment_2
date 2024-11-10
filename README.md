@@ -157,3 +157,65 @@ pip install xarray matplotlib numpy cartopy
 ## Example Plots
 The script will save the plots in the specified directory.
 
+# TreeMap Vizualization
+
+There are three interactive visualizations created using D3.js. Each visualization renders data from the `athlete_events.csv` file. Follow the instructions below to interact with each dashboard.
+
+## 1. Event Participation by Year and City 
+
+This visualization shows a **treemap** of event participation organized by **year** and **city**. You can interact with the following features:
+- **Tiling Method**: Select from `Squarify`, `Slice`, `Dice`, or `Slice-Dice` layouts.
+- **Top Years Display**: Limit the number of years displayed (e.g., top 5, 10, 15, etc.).
+
+### How to Use:
+1. Open `Viz1_Event_Participation.html` in a web browser.
+2. Select a tiling method from the dropdown menu.
+3. Choose the number of top years to display.
+4. The chart will update based on your selections.
+
+**Main File**: `Viz1_Event_Participation.html`
+
+---
+
+## 2. Medal Distribution by Age Group and Sex
+
+This visualization displays a treemap showing **medal distribution** by **age group** and **sex**. You can switch between different layout methods using the dropdown menu.
+
+### How to Use:
+1. Open `Viz3.html` in a web browser.
+2. Select the desired tiling method (Squarify, Slice, Dice, or Slice-Dice).
+3. The treemap will adjust to reflect your selection, displaying medal distributions by age groups and sex.
+
+**Main File**: `Viz3.html`
+
+---
+
+## 3. Participation Over Time in Volleyball
+
+This visualization tracks participation in **volleyball events** over time, grouped by countries. The layout and the number of years to display are customizable.
+
+### How to Use:
+1. Open `Viz4.html` in a web browser.
+2. Choose a tiling method from the dropdown.
+3. Select the number of top years to visualize.
+4. The visualization will update to reflect the changes.
+
+**Main File**: `Viz4.html`
+
+---
+
+## Dependencies
+
+Each HTML file relies on D3.js for rendering the treemaps. D3.js is loaded from a CDN, so an active internet connection is required to load the visualizations.
+Ensure that `athlete_events.csv` is located in the same directory as the HTML files when running them locally.
+
+---
+
+## Usage
+
+1. Download the files and place them in the same directory as `athlete_events.csv`.
+2. Open each HTML file in a browser to interact with the visualizations.
+3. Use the dropdown menus to change the display options.
+
+
+
