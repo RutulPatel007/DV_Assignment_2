@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viz 2: Medal Count by Country across Sports - Interactive Treemap with Color Gradient</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .node {
+            font-size: 12px;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #aaa;
+            padding: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <label for="tilingMethod">Choose Tiling Method:</label>
+    <select id="tilingMethod">
+        <option value="squarify">Squarify</option>
+        <option value="slice">Slice</option>
+        <option value="dice">Dice</option>
+        <option value="sliceDice">Slice-Dice</option>
+    </select>
+</div>
+
+<div>
+    <label for="numSports">Choose Number of Sports:</label>
+    <select id="numSports">
+        <option value="5">Top 5 Sports</option>
+        <option value="10">Top 10 Sports</option>
+        <option value="15">Top 15 Sports</option>
+        <option value="20">Top 20 Sports</option>
+        <option value="all">All Sports</option>
+    </select>
+</div>
+
+<div id="chart"></div>
+
+<script>
+const width = 800;
+const height = 600;
+
+// Function to create the treemap with a color gradient based on medal counts
+function drawTreemap(tilingMethod, numSports) {
+    d3.select("#chart").select("svg").remove(); // Clear previous chart
+
+    d3.csv("athlete_events.csv").then(data => {
+        // Filter and aggregate data by NOC (Country) and Sport with Medal counts
+        const medalData = d3.rollup(
+            data.filter(d => d.Medal !== "NA" && d.NOC === 'USA'),
+            v => v.length,
+            d => d.NOC,
+            d => d.Sport
+        );
+
+        // Convert aggregated data into a hierarchy structure
+        const medalDataHierarchy = { name: "Medals", children: [] };
+        for (let [country, sports] of medalData.entries()) {
+            const children = [];
+            for (let [sport, count] of sports.entries()) {
+                children.push({ name: sport, value: count });
+            }
+            medalDataHierarchy.children.push({ name: country, children: children });
+        }
+
+        // Sort countries by total medal count and keep the top 10 countries
+        medalDataHierarchy.children.sort((a, b) => 
+            d3.sum(b.children, d => d.value) - d3.sum(a.children, d => d.value)
+        );
+        medalDataHierarchy.children = medalDataHierarchy.children.slice(0, 10);
+
+        // Sort sports by athlete count and select top N sports based on user input
+        const topSports = (sportsData, numSports) => {
+            const sportsArray = [];
+            for (let [sport, count] of sportsData.entries()) {
+                sportsArray.push({ sport, count });
+            }
+            sportsArray.sort((a, b) => b.count - a.count);
+            return sportsArray.slice(0, numSports);
+        };
+
+        // Filter top N sports by athlete count
+        const allSports = new Map();
+        data.forEach(d => {
+            if (d.Medal !== "NA" && d.NOC === 'USA') {
+                allSports.set(d.Sport, (allSports.get(d.Sport) || 0) + 1);
+            }
+        });
+
+        const filteredSports = topSports(allSports, numSports);
+
+        // Filter the medalDataHierarchy based on the selected sports
+        medalDataHierarchy.children.forEach(country => {
+            country.children = country.children.filter(sport => 
+                filteredSports.some(filteredSport => filteredSport.sport === sport.name)
+            );
+        });
+
+        // Create a D3 hierarchy for the treemap layout
+        const root = d3.hierarchy(medalDataHierarchy)
+            .sum(d => d.value)
+            .sort((a, b) => b.value - a.value);
+
+        const treemap = d3.treemap()
+            .size([width, height])
+            .padding(1)
+            .tile(tilingMethod)
+            .round(true);
+
+        treemap(root);
+
+        // Set up a continuous color scale based on the count range
+        const color = d3.scaleSequential(d3.interpolateOranges)
+            .domain([0, d3.max(root.leaves(), d => d.value)]); // Adjust color based on max count
+
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("font", "10px sans-serif");
+
+        const leaf = svg.selectAll("g")
+            .data(root.leaves())
+            .join("g")
+            .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+        leaf.append("title")
+            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join(" > ")}\nMedals: ${d.value}`);
+
+        leaf.append("rect")
+            .attr("fill", d => color(d.value)) // Apply color gradient based on value
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill-opacity", 0.7)
+            .attr("stroke", d => d.depth === 1 ? "#666" : "#aaa")  // Darker stroke for country nodes
+            .attr("stroke-width", d => d.depth === 1 ? 3 : 1);     // Thicker stroke for country nodes
+
+        leaf.append("text")
+            .selectAll("tspan")
+            .data(d => [d.data.name, d.value])
+            .join("tspan")
+            .attr("x", 3)
+            .attr("y", (d, i) => `${1.1 + i * 0.9}em`)
+            .text(d => d);
+    });
+}
+
+// Set default tiling method and draw the initial chart
+let tileMethod = d3.treemapSquarify;
+let numSports = 5; // Default to top 5 sports
+drawTreemap(tileMethod, numSports);
+
+// Event listener for tiling method selection
+document.getElementById("tilingMethod").addEventListener("change", (event) => {
+    const method = event.target.value;
+    switch (method) {
+        case "slice":
+            tileMethod = d3.treemapSlice;
+            break;
+        case "dice":
+            tileMethod = d3.treemapDice;
+            break;
+        case "sliceDice":
+            tileMethod = d3.treemapSliceDice;
+            break;
+        default:
+            tileMethod = d3.treemapSquarify;
+    }
+    drawTreemap(tileMethod, numSports);
+});
+
+// Event listener for number of sports selection
+document.getElementById("numSports").addEventListener("change", (event) => {
+    numSports = event.target.value === "all" ? Infinity : parseInt(event.target.value, 10);
+    drawTreemap(tileMethod, numSports);
+});
+</script>
+
+</body>
+</html>

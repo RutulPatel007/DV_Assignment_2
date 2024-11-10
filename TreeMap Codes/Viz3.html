@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viz3: Medal Distribution by Age Group and Sex.</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .node {
+            font-size: 12px;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #aaa;
+            padding: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <label for="tilingMethod">Choose Tiling Method:</label>
+    <select id="tilingMethod">
+        <option value="squarify">Squarify</option>
+        <option value="slice">Slice</option>
+        <option value="dice">Dice</option>
+        <option value="sliceDice">Slice-Dice</option>
+    </select>
+</div>
+
+<div id="chart"></div>
+
+<script>
+const width = 800;
+const height = 600;
+const color = d3.scaleOrdinal(d3.schemeTableau10);
+
+// Function to create the treemap
+function drawTreemap(tilingMethod) {
+    d3.select("#chart").select("svg").remove(); // Clear previous chart
+
+    d3.csv("athlete_events.csv").then(data => {
+        const filteredData = data.filter(d => d.Medal !=='NA' && d.Sex && d.Age);
+
+        filteredData.forEach(d => {
+            // Convert Sex to readable values
+            d.Sex = d.Sex === 'M' ? 'Male' : 'Female';
+
+            // Age Group(s) mapping, converting age to an age group (e.g., 20 => '20-24')
+            const age = +d.Age;
+            if (age >= 20 && age <= 24) {
+                d.AgeGroup = '20-24';
+            } else if (age >= 25 && age <= 29) {
+                d.AgeGroup = '15-19';
+            
+            } else if (age >= 25 && age <= 29) {
+                d.AgeGroup = '25-29';
+            } else if (age >= 30 && age <= 34) {
+                d.AgeGroup = '30-34';
+            } else if (age >= 35 && age <= 39) {
+                d.AgeGroup = '35-39';
+            } else if (age >= 40 && age <= 44) {
+                d.AgeGroup = '40-44';
+            } else if (age >= 45 && age <= 49) {
+                d.AgeGroup = '45-49';
+            } else if (age >= 50 && age <= 54) {
+                d.AgeGroup = '50-54';
+            } else if (age >= 55 && age <= 59) {
+                d.AgeGroup = '55-59';
+            } else if (age >= 60) {
+                d.AgeGroup = '60+';
+            } 
+            //else {
+             //   d.AgeGroup = 'Unknown';
+            //}
+        });
+
+        // Organize data into a hierarchical structure
+        const medalData = d3.rollup(
+            filteredData,
+            v => d3.rollup(
+                v,
+                w => w.length,
+                d => d.AgeGroup
+            ),
+            d => d.Sex,
+            d => d.Medal
+        );
+
+        const medalDataHierarchy = { name: "Medals", children: [] };
+        for (let [sex, medals] of medalData.entries()) {
+            const sexChildren = [];
+            for (let [medal, ageGroups] of medals.entries()) {
+                const ageGroupChildren = [];
+                for (let [ageGroup, count] of ageGroups.entries()) {
+                    ageGroupChildren.push({ name: ageGroup, value: count });
+                }
+                sexChildren.push({ name: medal, children: ageGroupChildren });
+            }
+            medalDataHierarchy.children.push({ name: sex, children: sexChildren });
+        }
+
+        const root = d3.hierarchy(medalDataHierarchy)
+            .sum(d => d.value)
+            .sort((a, b) => b.value - a.value);
+
+        const treemap = d3.treemap()
+            .size([width, height])
+            .padding(1)
+            .tile(tilingMethod) // Apply selected tiling method
+            .round(true);
+
+        treemap(root);
+
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("font", "10px sans-serif");
+
+        const leaf = svg.selectAll("g")
+            .data(root.leaves())
+            .join("g")
+            .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+        leaf.append("title")
+            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join(" > ")}\n${d.value}`);
+
+        leaf.append("rect")
+            .attr("fill", d => color(d.parent.data.name))
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill-opacity", 0.7);
+
+        leaf.append("text")
+            .selectAll("tspan")
+            .data(d => [d.data.name, d.value])
+            .join("tspan")
+            .attr("x", 3)
+            .attr("y", (d, i) => `${1.1 + i * 0.9}em`)
+            .text(d => d);
+    });
+}
+
+// Set default tiling method and draw the initial chart
+let tileMethod = d3.treemapSquarify;
+drawTreemap(tileMethod);
+
+// Add event listener for dropdown to update chart on selection
+document.getElementById("tilingMethod").addEventListener("change", (event) => {
+    const method = event.target.value;
+    switch (method) {
+        case "slice":
+            tileMethod = d3.treemapSlice;
+            break;
+        case "dice":
+            tileMethod = d3.treemapDice;
+            break;
+        case "sliceDice":
+            tileMethod = d3.treemapSliceDice;
+            break;
+        default:
+            tileMethod = d3.treemapSquarify;
+    }
+    drawTreemap(tileMethod);
+});
+</script>
+
+</body>
+</html>

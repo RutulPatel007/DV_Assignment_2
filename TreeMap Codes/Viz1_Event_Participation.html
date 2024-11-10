@@ -1,0 +1,331 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Participation by Year and City - Interactive Treemap</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .node {
+            font-size: 12px;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #aaa;
+            padding: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <label for="tilingMethod">Choose Tiling Method:</label>
+    <select id="tilingMethod">
+        <option value="squarify">Squarify</option>
+        <option value="slice">Slice</option>
+        <option value="dice">Dice</option>
+        <option value="sliceDice">Slice-Dice</option>
+    </select>
+
+    <label for="topYears">Top Years to Display:</label>
+    <select id="topYears">
+        <option value="5">Top 5</option>
+        <option value="10">Top 10</option>
+        <option value="15">Top 15</option>
+        <option value="20">Top 20</option>
+    </select>
+</div>
+
+<div id="chart"></div>
+
+<script>
+const width = 800;
+const height = 600;
+const color = d3.scaleOrdinal(d3.schemeTableau10);
+
+// Function to create the treemap based on selected top years and tiling method
+function drawTreemap(tilingMethod, topN) {
+    d3.select("#chart").select("svg").remove(); // Clear previous chart
+
+    d3.csv("athlete_events.csv").then(data => {
+        // Filter and aggregate data by Year and City
+        const participationData = d3.rollup(
+            data,
+            v => v.length,
+            d => d.Year,
+            d => d.City
+        );
+
+        // Convert aggregated data into a hierarchy structure
+        const participationDataHierarchy = { name: "Participation", children: [] };
+        for (let [year, cities] of participationData.entries()) {
+            const children = [];
+            for (let [city, count] of cities.entries()) {
+                children.push({ name: city, value: count });
+            }
+            participationDataHierarchy.children.push({ name: year, children: children });
+        }
+
+        // Sort years by total athlete count and keep the top N years
+        participationDataHierarchy.children.sort((a, b) => 
+            d3.sum(b.children, d => d.value) - d3.sum(a.children, d => d.value)
+        );
+        participationDataHierarchy.children = participationDataHierarchy.children.slice(0, topN);
+
+        // Create a D3 hierarchy for the treemap layout
+        const root = d3.hierarchy(participationDataHierarchy)
+            .sum(d => d.value)
+            .sort((a, b) => b.value - a.value);
+
+        const treemap = d3.treemap()
+            .size([width, height])
+            .padding(1)
+            .tile(tilingMethod)
+            .round(true);
+
+        treemap(root);
+
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("font", "10px sans-serif");
+
+        const leaf = svg.selectAll("g")
+            .data(root.leaves())
+            .join("g")
+            .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+        leaf.append("title")
+            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join(" > ")}\n${d.value}`);
+
+        leaf.append("rect")
+            .attr("fill", d => color(d.parent.data.name))
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill-opacity", 0.7);
+
+        leaf.append("text")
+            .selectAll("tspan")
+            .data(d => [d.data.name, d.value])
+            .join("tspan")
+            .attr("x", 3)
+            .attr("y", (d, i) => `${1.1 + i * 0.9}em`)
+            .text(d => d);
+    });
+}
+
+// Set default values for tiling method and top years, and draw the initial chart
+let tileMethod = d3.treemapSquarify;
+let topN = 5;
+drawTreemap(tileMethod, topN);
+
+// Event listener for tiling method selection
+document.getElementById("tilingMethod").addEventListener("change", (event) => {
+    const method = event.target.value;
+    switch (method) {
+        case "slice":
+            tileMethod = d3.treemapSlice;
+            break;
+        case "dice":
+            tileMethod = d3.treemapDice;
+            break;
+        case "sliceDice":
+            tileMethod = d3.treemapSliceDice;
+            break;
+        default:
+            tileMethod = d3.treemapSquarify;
+    }
+    drawTreemap(tileMethod, topN);
+});
+
+// Event listener for top years selection
+document.getElementById("topYears").addEventListener("change", (event) => {
+    topN = +event.target.value;
+    drawTreemap(tileMethod, topN);
+});
+</script>
+
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viz1:Event Participation by Year and City - Interactive Treemap with Color Gradient</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .node {
+            font-size: 12px;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #aaa;
+            padding: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <label for="tilingMethod">Choose Tiling Method:</label>
+    <select id="tilingMethod">
+        <option value="squarify">Squarify</option>
+        <option value="slice">Slice</option>
+        <option value="dice">Dice</option>
+        <option value="sliceDice">Slice-Dice</option>
+    </select>
+
+    <label for="topYears">Top Years to Display:</label>
+    <select id="topYears">
+        <option value="5">Top 5</option>
+        <option value="10">Top 10</option>
+        <option value="15">Top 15</option>
+        <option value="20">Top 20</option>
+        <option value="25">Top 25</option>
+        <option value="30">Top 30</option>
+    </select>
+</div>
+
+<div id="chart"></div>
+
+<script>
+const width = 800;
+const height = 600;
+
+// Function to create the treemap with a color gradient based on athlete counts
+function drawTreemap(tilingMethod, topN) {
+    d3.select("#chart").select("svg").remove(); // Clear previous chart
+
+    d3.csv("athlete_events.csv").then(data => {
+        // Filter and aggregate data by Year and City
+        const participationData = d3.rollup(
+            data,
+            v => v.length,
+            d => d.Year,
+            d => d.City
+        );
+
+        // Convert aggregated data into a hierarchy structure
+        const participationDataHierarchy = { name: "Participation", children: [] };
+        for (let [year, cities] of participationData.entries()) {
+            const children = [];
+            for (let [city, count] of cities.entries()) {
+                children.push({ name: city, value: count });
+            }
+            participationDataHierarchy.children.push({ name: year, children: children });
+        }
+
+        // Sort years by total athlete count and keep the top N years
+        participationDataHierarchy.children.sort((a, b) => 
+            d3.sum(b.children, d => d.value) - d3.sum(a.children, d => d.value)
+        );
+        participationDataHierarchy.children = participationDataHierarchy.children.slice(0, topN);
+
+        // Create a D3 hierarchy for the treemap layout
+        const root = d3.hierarchy(participationDataHierarchy)
+            .sum(d => d.value)
+            .sort((a, b) => b.value - a.value);
+
+        const treemap = d3.treemap()
+            .size([width, height])
+            .padding(1)
+            .tile(tilingMethod)
+            .round(true);
+
+        treemap(root);
+
+        // Set up a continuous color scale based on the count range
+        const color = d3.scaleSequential(d3.interpolateBlues)
+            .domain([0, d3.max(root.leaves(), d => d.value)]);  // Adjust color based on max count
+
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("font", "10px sans-serif");
+
+        const leaf = svg.selectAll("g")
+            .data(root.leaves())
+            .join("g")
+            .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+        leaf.append("title")
+            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join(" > ")}\n${d.value}`);
+
+        leaf.append("rect")
+            .attr("fill", d => color(d.value)) // Apply color gradient based on value
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill-opacity", 0.7);
+
+        leaf.append("text")
+            .selectAll("tspan")
+            .data(d => [d.data.name, d.value])
+            .join("tspan")
+            .attr("x", 3)
+            .attr("y", (d, i) => `${1.1 + i * 0.9}em`)
+            .text(d => d);
+    });
+}
+
+// Set default values for tiling method and top years, and draw the initial chart
+let tileMethod = d3.treemapSquarify;
+let topN = 5;
+drawTreemap(tileMethod, topN);
+
+// Event listener for tiling method selection
+document.getElementById("tilingMethod").addEventListener("change", (event) => {
+    const method = event.target.value;
+    switch (method) {
+        case "slice":
+            tileMethod = d3.treemapSlice;
+            break;
+        case "dice":
+            tileMethod = d3.treemapDice;
+            break;
+        case "sliceDice":
+            tileMethod = d3.treemapSliceDice;
+            break;
+        default:
+            tileMethod = d3.treemapSquarify;
+    }
+    drawTreemap(tileMethod, topN);
+});
+
+// Event listener for top years selection
+document.getElementById("topYears").addEventListener("change", (event) => {
+    topN = +event.target.value;
+    drawTreemap(tileMethod, topN);
+});
+</script>
+
+</body>
+</html>
