@@ -52,3 +52,63 @@ pip install numpy matplotlib netCDF4 basemap datetime imageio Pillow
 
 ## Example Plots
 The script will save the plots in the specified `file_path`.
+
+
+
+
+
+# Streamline Plot Script
+
+## Description
+This script generates streamline plots based on wind speed and direction data. It creates images and compiles them into a GIF animation showing wind streamlines over time.
+
+## Prerequisites
+Ensure you have the following libraries installed:
+- numpy
+- xarray
+- imageio
+- matplotlib
+- basemap
+- scipy
+
+You can install all the necessary libraries using pip:
+```bash
+pip install numpy xarray imageio matplotlib basemap scipy
+```
+
+## Usage
+1. **Set up your data paths:**
+   - Update the `dir_data2`, `speed_data2`, `dir_data1`, and `speed_data1` variables in the script to point to the appropriate datasets for the years 2023 and 2024.
+
+2. **Run the script:**
+   - You can run the script directly to generate streamline plots for specific days.
+   - Example:
+     ```bash
+     python streamlines.py
+     ```
+
+   - The script will generate plots for the following days:
+     - November 1st, 2023
+     - November 11th, 2023
+     - November 21st, 2023
+     - December 1st, 2023
+     - December 11th, 2023
+     - December 21st, 2023
+     - December 31st, 2023
+     - January 9th, 2024
+     - January 19th, 2024
+     - January 29th, 2024
+
+3. **Generate GIF:**
+   - The script includes functionality to create a GIF from the generated plots.
+   - Ensure the `file_path` variable is set to the directory where your plots are saved.
+   - Example:
+     ```bash
+     python streamlines.py
+     ```
+
+## File Structure
+- `streamlines.py`: The main script file.
+
+## Example Plots
+The script will save the plots in the specified directory and create a GIF animation.
