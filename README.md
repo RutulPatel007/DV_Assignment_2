@@ -219,3 +219,44 @@ Ensure that `athlete_events.csv` is located in the same directory as the HTML fi
 
 
 
+# Contour Analysis Script
+
+This Python script loads various meteorological data files in netCDF format and displays their available variables. The script is designed to work with data such as precipitation, temperature, and humidity from different datasets, which can be used for further analysis or visualization.
+
+## Prerequisites
+
+The script requires Python 3 and the following Python packages:
+- `netCDF4` for working with netCDF data files
+- `xarray` for handling multi-dimensional arrays
+- `matplotlib` for visualizations
+- `numpy` for numerical operations
+
+Install these packages via:
+
+```bash
+pip install netCDF4 xarray matplotlib numpy
+```
+## Usage
+1. **Prepare Data Files**: Place the required netCDF files (e.g., sph_2023.nc, pr_2024.nc) in the script’s directory, or update the file paths in the script if they are stored elsewhere.
+2. **Run the Script**: Execute the script to load each netCDF dataset and list available variables within each file. This will help verify the structure and contents of each dataset for further analysis or plotting.
+ ```bash
+python contour.py
+```
+3. **Viewing Variables**: The script will print the variables in each dataset to the console, allowing you to inspect the specific parameters contained within each netCDF file.
+
+## Modifying for Contour Plots
+To add contour plots, identify relevant variables (e.g., lat, lon, temperature) and use **matplotlib.pyplot.contour()** for visualization. Here’s an example snippet:
+ ```bash
+import matplotlib.pyplot as plt
+
+# Example contour plot
+data = data_sph['temperature_variable_name'][:]  # Replace with actual variable name
+plt.contour(data)
+plt.title("Contour Plot")
+plt.show()
+
+```
+Please update the example file paths in the code if your data files are named differently or located in a different directory.
+ ```bash
+python contour.py
+```
