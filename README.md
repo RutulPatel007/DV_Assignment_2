@@ -316,9 +316,10 @@ Output:
 2. temperature_animation_logarithmic
 
 ## AUTHOR CONTRIBUTIONS
-A. Task 1 By Areen Vaghasiya
-   • Color maps, Tree maps
-B. Task 2 By Aryan Vaghasiya
-   • Node Link diagrams, Contour maps
-C. Task 3 By Rutul Patel
-   • Parallel Coordinate Plots, Quiver Plots and StreamLine Plots
+1. Task 1 By Areen Vaghasiya
+   -Color maps, Tree maps
+
+2. Task 2 By Aryan Vaghasiya
+   - Node Link diagrams, Contour maps
+3. Task 3 By Rutul Patel
+   - Parallel Coordinate Plots, Quiver Plots and StreamLine Plots
