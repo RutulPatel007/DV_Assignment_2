@@ -317,7 +317,7 @@ Output:
 
 ## AUTHOR CONTRIBUTIONS
 1. Task 1 By Areen Vaghasiya
-   -Color maps, Tree maps
+   - Color maps, Tree maps
 
 2. Task 2 By Aryan Vaghasiya
    - Node Link diagrams, Contour maps
