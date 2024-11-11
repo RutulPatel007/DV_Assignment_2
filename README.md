@@ -315,7 +315,7 @@ Output:
 1. temperature_animation_continuous
 2. temperature_animation_logarithmic
 
-##AUTHOR CONTRIBUTIONS
+## AUTHOR CONTRIBUTIONS
 A. Task 1 By Areen Vaghasiya
    • Color maps, Tree maps
 B. Task 2 By Aryan Vaghasiya
