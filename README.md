@@ -314,3 +314,11 @@ python colormap\ \(2\).py
 Output:
 1. temperature_animation_continuous
 2. temperature_animation_logarithmic
+
+##AUTHOR CONTRIBUTIONS
+A. Task 1 By Areen Vaghasiya
+   • Color maps, Tree maps
+B. Task 2 By Aryan Vaghasiya
+   • Node Link diagrams, Contour maps
+C. Task 3 By Rutul Patel
+   • Parallel Coordinate Plots, Quiver Plots and StreamLine Plots
